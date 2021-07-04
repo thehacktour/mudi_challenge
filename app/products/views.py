@@ -5,15 +5,27 @@ from rest_framework.response import Response
 from .models import ProductModel
 from .serializer import ProductSerializer
 
+
 class AllProducts(APIView):
 
-    def get(self, request):
+    def get(self, request, format=None):
 
         products = ProductModel.objects.all()
-        product_serializer = ProductSerializer(products, many=True)
+        product_serializer = ProductSerializer(products,many=True)
         return Response(product_serializer.data)
 
+class AllCategorys(APIView):
+
+    def get(sel, request, format=None):
+
+        products_categorys = [category.category for category in ProductModel.objects.all()]
+        return Response(products_categorys)
+
+class AddProduct(APIView):
+
+
     def post(self, request):
+
 
         data = {
 
@@ -21,22 +33,37 @@ class AllProducts(APIView):
             'plataform': request.data.get('plataform'),
             'price': request.data.get('price'),
             'restaurant': request.data.get('restaurant'),
-            'category': request.data.get('category')
+            'category': request.data.get('category'),
 
         }
 
-        product_serializer = ProductSerializer(data=data)
+        products = ProductSerializer(data=data)
 
-        if product_serializer.is_valid():
-            product_serializer.save()
-            return Response(product_serializer.data)
+        if products.is_valid():
+            products.save()
+            return Response(products.data)
         else:
-            return Response(product_serializer.errors)
+            return Response(products.errors)
 
-class AllCategorys(APIView):
-    
-    def get(self, request):
 
-        product_category = self.get_category(pk)
-        serializer = ProductSerializer(product_category)
+class ProductById(APIView):
+
+    def get_product(self, id):
+        try:
+            return ProductModel.objects.get(id=id)
+        except ProductModel.DoesNotExist:
+            return Http404
+
+    def get(self, request, id,format=None):
+
+        product = self.get_product(id=id)
+        serializer = ProductSerializer(product)
         return Response(serializer.data)
+
+class ProductByCategory(APIView):
+
+    def get(self, request, category, format=None):
+
+        product= ProductModel.objects.filter(category=category)
+        product_serializer = ProductSerializer(product, many=True)
+        return Response(product_serializer.data)
