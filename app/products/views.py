@@ -59,3 +59,11 @@ class ProductById(APIView):
         product = self.get_product(id=id)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
+
+class ProductByCategory(APIView):
+
+    def get(self, request, category, format=None):
+
+        product= ProductModel.objects.filter(category=category)
+        product_serializer = ProductSerializer(product, many=True)
+        return Response(product_serializer.data)
