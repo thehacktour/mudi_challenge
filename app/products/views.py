@@ -4,6 +4,15 @@ from rest_framework.response import Response
 from .models import ProductModel
 from .serializer import ProductSerializer
 
+
+class AllProducts(APIView):
+
+    def get(self, request, format=None):
+
+        products = ProductModel.objects.all()
+        product_serializer = ProductSerializer(products,many=True)
+        return Response(product_serializer.data)
+
 class AllCategorys(APIView):
 
     def get(sel, request, format=None):
